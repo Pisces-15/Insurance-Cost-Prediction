@@ -5,48 +5,51 @@ import numpy as np
 # ------------------ PAGE CONFIG ------------------
 st.set_page_config(page_title="Insurance App", layout="wide")
 
+# ------------------ CSS ------------------
 # ------------------ CUSTOM CSS ------------------
 page_bg = """
 <style>
+
+/* Background Image (new one) */
 [data-testid="stAppViewContainer"] {
-    background-image: url("https://images.unsplash.com/photo-1588776814546-1ffcf47267a5");
+    background-image: url("https://images.unsplash.com/photo-1556742049-0cfed4f6a45d");
     background-size: cover;
     background-position: center;
 }
 
-/* Light transparent overlay */
-[data-testid="stAppViewContainer"]::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.6); /* LIGHT transparency */
-    z-index: 0;
+/* Light overlay so text is visible */
+.stApp {
+    background: rgba(255, 255, 255, 0.7);
 }
 
-/* Keep content above overlay */
-.main {
-    position: relative;
-    z-index: 1;
+/* Make ALL text black */
+html, body, [class*="css"]  {
+    color: black !important;
 }
 
-/* Heading styling */
-h1 {
-    color: #1a1a1a;
-    font-weight: 800;
+/* Headings */
+h1, h2, h3 {
+    color: black !important;
+    font-weight: bold;
 }
 
-/* Sidebar styling */
+/* Sidebar */
 [data-testid="stSidebar"] {
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: rgba(255, 255, 255, 0.9);
+    color: black;
 }
+
+/* Buttons */
+.stButton>button {
+    background-color: #000000;
+    color: white;
+    border-radius: 8px;
+}
+
 </style>
 """
 
 st.markdown(page_bg, unsafe_allow_html=True)
-
 # ------------------ LOAD MODEL ------------------
 model = pickle.load(open("Insurance.pkl", "rb"))
 
