@@ -69,24 +69,30 @@ if st.button("Predict"):
     input_data = np.array([[age, bmi, children, smoker]])
     prediction = model.predict(input_data)
 
-    st.success(f"Estimated Insurance Cost: ₹ {round(prediction[0], 2)}")
+   
 if st.button("Predict"):
-    input_data = np.array([[age, bmi, children, smoker]])
-    prediction = model.predict(input_data)
+    try:
+        input_data = np.array([[age, bmi, children, smoker]])
+        prediction = model.predict(input_data)
 
-    st.markdown(
-        f"""
-        <div style='
-            background-color: rgba(255,255,255,0.8);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 20px;
-            color: black;
-            font-weight: bold;
-        '>
-            💰 Estimated Insurance Cost: ₹ {round(prediction[0], 2)}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        result = round(float(prediction[0]), 2)
+
+        st.markdown(
+            f"""
+            <div style="
+                background-color: rgba(255,255,255,0.85);
+                padding: 15px;
+                border-radius: 10px;
+                text-align: center;
+                font-size: 20px;
+                color: black;
+                font-weight: bold;
+            ">
+                💰 Estimated Insurance Cost: ₹ {result}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    except Exception as e:
+        st.error(f"Error: {e}")
