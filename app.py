@@ -6,84 +6,74 @@ import numpy as np
 model = pickle.load(open("Insurance.pkl", "rb"))
 
 # Page config
-st.set_page_config(page_title="Insurance Predictor", page_icon="💰", layout="centered")
-
-# Custom CSS
-st.markdown("""
-    <style>
-    .main {
-        background: linear-gradient(to right, #74ebd5, #ACB6E5);
-    }
-    .title {
-        text-align: center;
-        font-size: 40px;
-        font-weight: bold;
-        color: #ffffff;
-        margin-bottom: 20px;
-    }
-    .card {
-        background-color: rgba(255,255,255,0.9);
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
-    }
-    .result {
-        background-color: #ffffff;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        font-size: 22px;
-        font-weight: bold;
-        color: green;
-        margin-top: 20px;
-    }
-    </style>
-""", unsafe_allow_html=True)
+st.set_page_config(page_title="Insurance Predictor", page_icon="💰")
 
 # Title
-st.markdown('<div class="title">💰 Insurance Cost Predictor</div>', unsafe_allow_html=True)
+st.title("💰 Insurance Cost Prediction")
 
-# Card container
-st.markdown('<div class="card">', unsafe_allow_html=True)
+st.write("Predict your insurance cost using ML model")
 
-# Layout with columns
-col1, col2 = st.columns(2)
+# Sidebar
+st.sidebar.header("📝 Enter Your Details")
 
-with col1:
-    age = st.number_input("Age", 1, 100, 25)
-    bmi = st.number_input("BMI", 10.0, 50.0, 22.0)
-    children = st.number_input("Children", 0, 10, 0)
-
-with col2:
-    sex = st.selectbox("Gender", ["Male", "Female"])
-    smoker = st.selectbox("Smoker", ["Yes", "No"])
-    region = st.selectbox("Region", ["Northeast", "Northwest", "Southeast", "Southwest"])
+age = st.sidebar.number_input("Age", 1, 100, 25)
+sex = st.sidebar.selectbox("Gender", ["Male", "Female"])
+bmi = st.sidebar.number_input("BMI", 10.0, 50.0, 22.0)
+children = st.sidebar.number_input("Children", 0, 10, 0)
+smoker = st.sidebar.selectbox("Smoker", ["Yes", "No"])
+region = st.sidebar.selectbox("Region", ["Northeast", "Northwest", "Southeast", "Southwest"])
 
 # Encoding
 sex = 1 if sex == "Male" else 0
 smoker = 1 if smoker == "Yes" else 0
 
+region_map = {
+    "Northeast": 0,
+    "Northwest": 1,
+    "Southeast": 2,
+    "Southwest": 3
+}
+region_encoded = region_map[region]
+
+# One-hot encoding
 region_northeast = 1 if region == "Northeast" else 0
 region_northwest = 1 if region == "Northwest" else 0
 region_southeast = 1 if region == "Southeast" else 0
-region_southwest = 1 if region == "Southwest" else 0
 
-# Button centered
-st.markdown("<br>", unsafe_allow_html=True)
-predict_btn = st.button("🚀 Predict Cost")
+# Button
+if st.sidebar.button("🚀 Predict"):
 
-# Prediction
-if predict_btn:
-    input_data = np.array([[age, sex, bmi, children, smoker,
-                            region_northeast, region_northwest,
-                            region_southeast, region_southwest]])
+    try:
+        expected = model.n_features_in_
 
-    prediction = model.predict(input_data)
+        # CASE 1: 6 features
+        if expected == 6:
+            input_data = np.array([[age, sex, bmi, children, smoker, region_encoded]])
 
-    st.markdown(f"""
-        <div class="result">
-            💰 Estimated Insurance Cost: ₹ {round(prediction[0], 2)}
-        </div>
-    """, unsafe_allow_html=True)
+        # CASE 2: 8 features (drop one dummy)
+        elif expected == 8:
+            input_data = np.array([[age, sex, bmi, children, smoker,
+                                    region_northeast, region_northwest, region_southeast]])
 
-st.markdown('</div>', unsafe_allow_html=True)
+        # CASE 3: 9 features (all dummies)
+        elif expected == 9:
+            region_southwest = 1 if region == "Southwest" else 0
+            input_data = np.array([[age, sex, bmi, children, smoker,
+                                    region_northeast, region_northwest,
+                                    region_southeast, region_southwest]])
+
+        else:
+            st.error("⚠️ Model feature mismatch. Please check training data.")
+            st.stop()
+
+        # Prediction
+        prediction = model.predict(input_data)
+
+        st.success(f"💰 Estimated Insurance Cost: ₹ {round(prediction[0], 2)}")
+
+    except Exception as e:
+        st.error("⚠️ Error occurred while prediction")
+        st.write(e)
+
+# Debug info (optional remove later)
+st.write("Model expects features:", model.n_features_in_)
