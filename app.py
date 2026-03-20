@@ -47,36 +47,40 @@ h1 {
 
 st.markdown(page_bg, unsafe_allow_html=True)
 
-# Load model
+# ------------------ LOAD MODEL ------------------
 model = pickle.load(open("Insurance.pkl", "rb"))
 
 # ------------------ SIDEBAR ------------------
 st.sidebar.title("👩‍💻 About Me")
 
 st.sidebar.write("### Personal Information")
-st.sidebar.write("Name: Sakshi Patil")
-st.sidebar.write("Stream: IT Engineering")
+st.sidebar.write("**Name:** Sakshi Patil")
+st.sidebar.write("**Stream:** IT Engineering")
 
 st.sidebar.write("### 📞 Contact")
-st.sidebar.write("Email: patilsakshi1554@email.com")
-
+st.sidebar.write("Email: sakshi@email.com")
+st.sidebar.write("Phone: 1234567890")
 
 # ------------------ MAIN PAGE ------------------
-st.title("🏥 Insurance Cost Prediction App")
+st.markdown("<h1>🏥 Insurance Cost Prediction App</h1>", unsafe_allow_html=True)
 
-st.write("Enter details below to predict insurance charges:")
+st.write("### Enter details below to predict insurance charges:")
 
 # Input fields
-age = st.number_input("Age", min_value=1, max_value=100, value=25)
-bmi = st.number_input("BMI", min_value=10.0, max_value=50.0, value=22.0)
-children = st.number_input("Number of Children", min_value=0, max_value=10, value=0)
+col1, col2 = st.columns(2)
 
-smoker = st.selectbox("Smoker", ["No", "Yes"])
+with col1:
+    age = st.number_input("Age", 1, 100, 25)
+    bmi = st.number_input("BMI", 10.0, 50.0, 22.0)
+
+with col2:
+    children = st.number_input("Children", 0, 10, 0)
+    smoker = st.selectbox("Smoker", ["No", "Yes"])
+
 smoker = 1 if smoker == "Yes" else 0
 
 region = st.selectbox("Region", ["Southwest", "Southeast", "Northwest", "Northeast"])
 
-# Encode region manually (example encoding)
 region_dict = {
     "Southwest": 0,
     "Southeast": 1,
@@ -86,9 +90,10 @@ region_dict = {
 region = region_dict[region]
 
 # ------------------ PREDICTION ------------------
-if st.button("Predict 💡"):
+st.write("")
+
+if st.button("🚀 Predict Insurance Cost"):
     input_data = np.array([[age, bmi, children, smoker, region]])
-    
     prediction = model.predict(input_data)
 
     st.success(f"💰 Estimated Insurance Cost: ₹ {round(prediction[0], 2)}")
